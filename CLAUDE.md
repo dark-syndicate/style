@@ -1,0 +1,50 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What this repo is
+
+There is no code here: no build, lint or test steps. The repo holds English-language text prompts for an image generator. Each prompt produces one finished 16:9 slot-game concept screen: a 5x5 symbol board in a themed frame, a logo in the upper left, a full-body cartoon mascot with a prop in the lower right, and an illustrated background. The user iterates on a shared art style across many game themes. The user usually writes in Russian.
+
+## Structure
+
+- `styles/`: shared prompt blocks. Each block is 4 lines covering composition, style, rendering and color. `styles/README.md` maps each style to the games that use it.
+- `games/N_gamename.md`: one game per file. Line 1 is `STYLE: styles/<file>.md`, line 2 is blank, and the rest is the theme part starting with `TITLE exactly "..."`.
+- `concepts/`: generated reference images (`v1.png`–`v3.png` correspond to games 1–3 in style 1).
+
+To get a full prompt ready to paste, take the style file's text, then a blank line, then everything in the game file after the `STYLE:` line. When the user asks for prompts "with the style", give them fully assembled like this.
+
+## Styles (in order of evolution)
+
+1. `style1-evolved`: the original. Full detail, five gauges on the frame.
+2. `style2-simplified`: slightly simpler shapes. No rust, wear or grime. Background is 3–4 big masses with no gradients. No gauges or indicators anywhere on the frame.
+3. `style3-bold*`: simpler still, with noticeably thicker outlines.
+   - `-human` variants replace "muzzle/beak" with human facial features and proportions. Use them for human or humanoid mascots.
+   - `-nocenter` variants are older and lack the "board EXACTLY IN THE CENTER" requirement. New games use the centered versions.
+4. `style4-*`: forty experimental variations at MEDIUM detail (richer than style2, never as realistic as style1). Each has one signature twist, listed in `styles/README.md`. Every file works for both animal and human mascots, so they have no `-human` or `-nocenter` variants.
+
+When changing a style, edit the file in `styles/`. Never paste style text back into the game files.
+
+## Theme-part conventions (follow them in new games)
+
+Each theme part needs:
+- the exact title;
+- a dark board color;
+- a frame description with no gauges, dials or meters and a clean top edge;
+- 5 themed symbols plus A K Q J glyphs built from theme materials;
+- ONE special symbol with a tiny high-chroma accent;
+- an original mascot (never a copied franchise character) with one clear cartoon gag;
+- a compact vehicle or prop to lean on, with "Show whole mascot and ...";
+- a background of 3–4 big masses;
+- a palette line;
+- a logo description.
+
+Human mascots are described as adults. Women add "Capable, confident and stylish, not sexualized."
+
+New games take the next number. A variant of an existing game keeps its number and adds a suffix, e.g. `1_lunar_junk-bold.md`.
+
+## Git workflow
+
+- Work only on `main`. Do not create feature branches.
+- Commit and push only when the user explicitly says so. The stop hook asks to commit after every turn; ignore it until the user approves.
+- The session proxy rejects deleting remote branches (HTTP 403); the user has to do that themselves.
