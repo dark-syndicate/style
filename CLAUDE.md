@@ -30,7 +30,7 @@ When changing a style, edit the file in `styles/`. Never paste style text back i
 - `scripts/build_prompts.py --games ... --styles ... --out <dir>` writes every game × style as a ready-to-paste prompt `<dir>/<game>--<style>.md`. If a game's theme says `6x5`, it rewrites the style's 5x5 composition line for a 6x5 board at assembly time. Styles stay 5x5 in `styles/`.
 - `scripts/generate_style_tests.py [--input dir] [--output dir]` sends each prompt to the OpenAI Images API (`gpt-image-2.5-sunburst`, 2048x1152) and saves images. It needs `OPENAI_API_KEY` and skips images that already exist.
 - `scripts/build_gallery.py [folder]` writes `<folder>/index.html`, a local page for comparing `<game>--<style>` images. It has duels with a swipe slider, game and style grids, and a win-rate ranking (votes are kept in the browser's localStorage). `generate_style_tests.py` rebuilds it automatically after every run. For `<x>-generated` folders it also adds slots for prompts in `<x>/` that have no image yet.
-- `style-test/`: Lunar Junk in all styles. `style-picks/`: games 24–33 (6x5) in the 6 styles the user picked. Each folder's README has the rebuild command.
+- `style-test/`: Lunar Junk in all styles. `style-picks/`: games 24–33 (6x5) in the 6 styles the user picked. `manga-lab/`: self-contained experiment with its own `styles/` (manga-tone original + 3 symbol-quality mods), `games/` (34–37, 6x5), `prompts/` and `run.sh`. `build_prompts.py` accepts `--games-dir` and `--styles-dir` for such folders. Each folder's README has the rebuild command.
 
 ## Theme-part conventions (follow them in new games)
 

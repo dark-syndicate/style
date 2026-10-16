@@ -36,14 +36,14 @@ def find_game(key):
     matches = sorted(GAMES_DIR.glob(f"{key}_*.md"))
     matches = [m for m in matches if "-" not in m.stem]  # skip variants like 1_lunar_junk-bold
     if len(matches) != 1:
-        sys.exit(f"game '{key}': expected one match in games/, found {[m.name for m in matches]}")
+        sys.exit(f"game '{key}': expected one match in {GAMES_DIR.name}/, found {[m.name for m in matches]}")
     return matches[0]
 
 
 def find_style(key):
     path = STYLES_DIR / f"{Path(key).stem}.md"
     if not path.exists():
-        sys.exit(f"style '{key}' not found in styles/")
+        sys.exit(f"style '{key}' not found in {STYLES_DIR}")
     return path
 
 
@@ -69,7 +69,12 @@ def main():
     p.add_argument("--games", nargs="+", required=True)
     p.add_argument("--styles", nargs="+", required=True)
     p.add_argument("--out", required=True)
+    p.add_argument("--games-dir", default="games", help="folder with game theme files")
+    p.add_argument("--styles-dir", default="styles", help="folder with style files")
     args = p.parse_args()
+
+    global GAMES_DIR, STYLES_DIR
+    GAMES_DIR, STYLES_DIR = ROOT / args.games_dir, ROOT / args.styles_dir
 
     games = [find_game(g) for g in args.games]
     styles = [find_style(s) for s in args.styles]
