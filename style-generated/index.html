@@ -117,8 +117,19 @@ const DATA = {"title": "style-generated", "games": [{"id": "1_lunar_junk", "labe
 const KEY = "style-duel:" + DATA.title;
 const games = DATA.games, styles = DATA.styles;
 const label = (list, id) => (list.find(x => x.id === id) || {label: id}).label;
-const has = (g, s) => !!DATA.images[g + "--" + s];
-const src = (g, s) => DATA.images[g + "--" + s];
+// Images are looked up by name at view time, so the page keeps working even if it was
+// built before the images existed. Files that fail to load are marked missing.
+const missing = new Set();
+const has = (g, s) => !missing.has(g + "--" + s);
+const src = (g, s) => DATA.images[g + "--" + s] || g + "--" + s + ".png";
+let rerender = 0;
+function miss(g, s) {
+  const k = g + "--" + s;
+  if (missing.has(k)) return;
+  missing.add(k);
+  if (state.game === g && (state.a === s || state.b === s)) setPair(state.pairIdx);
+  cancelAnimationFrame(rerender); rerender = requestAnimationFrame(() => render());
+}
 
 function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
@@ -136,6 +147,10 @@ games.forEach(g => {
 });
 function setPair(i) {
   if (!pairs.length) return;
+  for (let n = 0; n < pairs.length; n++, i++) {
+    const [g, a, b] = pairs[((i % pairs.length) + pairs.length) % pairs.length];
+    if (has(g, a) && has(g, b)) break;
+  }
   state.pairIdx = ((i % pairs.length) + pairs.length) % pairs.length;
   const [g, a, b] = pairs[state.pairIdx];
   state.game = g; state.a = a; state.b = b;
@@ -153,7 +168,7 @@ $("tabs").onclick = e => { const t = e.target.dataset.tab; if (t) { state.tab = 
 
 function imgCard(g, s, cls, cap) {
   if (!has(g, s)) return `<div class="card ${cls}"><div class="missing">нет картинки</div><span class="cap">${cap}</span></div>`;
-  return `<div class="card ${cls}"><img loading="lazy" src="${src(g, s)}" data-g="${g}" data-s="${s}" alt="${cap}"><span class="cap">${cap}</span></div>`;
+  return `<div class="card ${cls}"><img loading="lazy" src="${src(g, s)}" onerror="miss('${g}','${s}')" data-g="${g}" data-s="${s}" alt="${cap}"><span class="cap">${cap}</span></div>`;
 }
 
 function renderDuel() {
@@ -164,7 +179,7 @@ function renderDuel() {
     $("duelView").innerHTML = `<div class="side">${imgCard(g, a, "A", "A · " + la)}${imgCard(g, b, "B", "B · " + lb)}</div>`;
   } else {
     $("duelView").innerHTML = `<div class="swipe" id="swipe">
-      <img src="${src(g, b) || ""}" alt="B"><img class="topA" id="topA" src="${src(g, a) || ""}" alt="A">
+      <img src="${src(g, b)}" onerror="miss('${g}','${b}')" alt="B"><img class="topA" id="topA" src="${src(g, a)}" onerror="miss('${g}','${a}')" alt="A">
       <div class="divider" id="divider"></div>
       <span class="cap capA">A · ${la}</span><span class="cap capB">B · ${lb}</span></div>`;
     const sw = $("swipe");

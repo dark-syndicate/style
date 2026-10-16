@@ -54,5 +54,6 @@ New games take the next number. A variant of an existing game keeps its number a
 ## Git workflow
 
 - Work only on `main`. Do not create feature branches.
-- Commit and push only when the user explicitly says so. The stop hook asks to commit after every turn; ignore it until the user approves.
+- Commit and push to `main` as soon as a requested change is done; no need to wait for approval.
+- The user also pushes generated images from their machine, so fetch first. If the push is rejected, rebase onto `origin/main` and push again.
 - The session proxy rejects deleting remote branches (HTTP 403); the user has to do that themselves.
