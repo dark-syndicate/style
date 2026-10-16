@@ -17,7 +17,7 @@
 
 Стили: `style4-manga-tone`, `style4-arcade-cabinet`, `style4-chrome-shine`, `style4-faceted-geo`, `style4-rubberhose-mix`, `style4-spooky-glow`.
 
-Пересобрать промпты (из корня репозитория):
+Пересобрать промпты (из корня репозитория). Внимание: из этих 6 стилей в `styles/` остались только `style4-manga-tone` и `style4-faceted-geo`, поэтому команду ниже нужно сократить до них; уже собранные промпты в папке сохраняют полный текст всех 6 стилей.
 
 ```sh
 python3 scripts/build_prompts.py --games 24 25 26 27 28 29 30 31 32 33 --styles style4-manga-tone style4-arcade-cabinet style4-chrome-shine style4-faceted-geo style4-rubberhose-mix style4-spooky-glow --out style-picks

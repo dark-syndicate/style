@@ -14,14 +14,14 @@ There is no code here: no build, lint or test steps. The repo holds English-lang
 
 To get a full prompt ready to paste, take the style file's text, then a blank line, then everything in the game file after the `STYLE:` line. When the user asks for prompts "with the style", give them fully assembled like this.
 
-## Styles (in order of evolution)
+## Styles
+
+Only five styles are kept in `styles/` (the rest were deleted on request; their text survives in git history and in the assembled prompts in `style-test/` and `style-picks/`):
 
 1. `style1-evolved`: the original. Full detail, five gauges on the frame.
 2. `style2-simplified`: slightly simpler shapes. No rust, wear or grime. Background is 3–4 big masses with no gradients. No gauges or indicators anywhere on the frame.
-3. `style3-bold*`: simpler still, with noticeably thicker outlines.
-   - `-human` variants replace "muzzle/beak" with human facial features and proportions. Use them for human or humanoid mascots.
-   - `-nocenter` variants are older and lack the "board EXACTLY IN THE CENTER" requirement. New games use the centered versions.
-4. `style4-*`: forty experimental variations at MEDIUM detail (richer than style2, never as realistic as style1). Each has one signature twist, listed in `styles/README.md`. Every file works for both animal and human mascots, so they have no `-human` or `-nocenter` variants.
+3. `style3-bold`: simpler still, with noticeably thicker outlines and the board EXACTLY IN THE CENTER. Used for animal and human mascots alike (the old `-human`/`-nocenter` variants were removed).
+4. `style4-faceted-geo` and `style4-manga-tone`: MEDIUM detail (richer than style2, never as realistic as style1). `manga-tone` is the user's favourite; both work for animal and human mascots.
 
 When changing a style, edit the file in `styles/`. Never paste style text back into the game files.
 
