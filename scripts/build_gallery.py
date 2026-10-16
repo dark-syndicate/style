@@ -4,11 +4,11 @@
 Usage (from the repo root):
     python3 scripts/build_gallery.py                        # style-picks-generated/
     python3 scripts/build_gallery.py style-generated
-    python3 scripts/build_gallery.py style-cross-generated --only bowling_bears --only mime
+    python3 scripts/build_gallery.py style-picks-generated --only bowling_bears --only mime
 
 Writes <folder>/index.html (self-contained, images referenced by relative path).
 If <folder> ends with "-generated" and the matching prompt folder exists (e.g.
-style-cross-generated -> style-cross), every prompt gets a slot, so images that are not
+style-picks-generated -> style-picks), every prompt gets a slot, so images that are not
 generated yet show as placeholders. generate_style_tests.py rebuilds the page after each run.
 """
 
