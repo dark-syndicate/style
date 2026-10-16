@@ -4,6 +4,7 @@
 Usage (from the repo root):
     python3 scripts/build_gallery.py                        # style-picks-generated/
     python3 scripts/build_gallery.py style-generated
+    python3 scripts/build_gallery.py style-cross-generated --only bowling_bears --only mime
 
 Writes <folder>/index.html (self-contained, images referenced by relative path).
 If <folder> ends with "-generated" and the matching prompt folder exists (e.g.
@@ -11,6 +12,7 @@ style-cross-generated -> style-cross), every prompt gets a slot, so images that 
 generated yet show as placeholders. generate_style_tests.py rebuilds the page after each run.
 """
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -29,7 +31,7 @@ def label(stem, strip_prefixes=()):
     return " ".join(w.capitalize() for w in "-".join(parts).replace("-", " ").split())
 
 
-def build(folder):
+def build(folder, only=()):
     folder = Path(folder)
     prompts = folder.with_name(folder.name[: -len("-generated")]) if folder.name.endswith("-generated") else None
     images, games, styles = {}, {}, {}
@@ -38,6 +40,8 @@ def build(folder):
         entries += [(f.stem, None) for f in sorted(prompts.glob("*--*.md"))]
     if folder.is_dir():
         entries += [(f.stem, f.name) for f in sorted(folder.iterdir()) if f.suffix.lower() in EXTS and "--" in f.stem]
+    if only:
+        entries = [e for e in entries if any(o in e[0] for o in only)]
     for stem, name in entries:
         game, style = stem.split("--", 1)
         if name:
@@ -60,7 +64,11 @@ def build(folder):
 
 
 def main():
-    build(ROOT / (sys.argv[1] if len(sys.argv) > 1 else "style-picks-generated"))
+    p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("folder", nargs="?", default="style-picks-generated")
+    p.add_argument("--only", action="append", default=[], help="substring filter on file name, repeatable")
+    args = p.parse_args()
+    build(ROOT / args.folder, args.only)
 
 
 TEMPLATE = r"""<!doctype html>

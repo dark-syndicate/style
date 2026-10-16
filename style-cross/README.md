@@ -15,6 +15,8 @@
 python3 scripts/build_prompts.py --games 24 25 26 27 28 29 30 31 32 33 --styles style5-geo-manga-balanced style5-geo-manga-ink style5-geo-manga-prism --out style-cross
 # сгенерировать картинки
 python3 scripts/generate_style_tests.py --input style-cross --output style-cross-generated
-# галерея для сравнения
-python3 scripts/build_gallery.py style-cross-generated
+# только 3 игры (генерация и галерея)
+python3 scripts/generate_style_tests.py --input style-cross --output style-cross-generated --only bowling_bears --only safecracker_sal --only magnificent_mime
+# галерея вручную, с тем же фильтром
+python3 scripts/build_gallery.py style-cross-generated --only bowling_bears --only safecracker_sal --only magnificent_mime
 ```
