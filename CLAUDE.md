@@ -39,7 +39,7 @@ Each theme part needs:
 - the exact title;
 - a dark board color;
 - a frame description with no gauges, dials or meters and a clean top edge;
-- 4 HIGH + 5 LOW themed symbols and no letter or card-rank glyphs (no A K Q J); in lines games the highs share one accent and the lows another, in cluster-pays games every symbol has its own dominant color;
+- 4 HIGH + 5 LOW themed symbols and no letter or card-rank glyphs (no A K Q J); in lines games every HIGH has its own accent color by rank and each LOW repeats the color of the HIGH of the same rank (H1–L1, H2–L2, …; L5 gets its own); in cluster-pays games every symbol has its own dominant color;
 - ONE special symbol with a tiny high-chroma accent;
 - an original mascot (never a copied franchise character) with one clear cartoon gag;
 - a compact vehicle or prop to lean on, with "Show whole mascot and ...";
