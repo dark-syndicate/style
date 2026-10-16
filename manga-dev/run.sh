@@ -5,6 +5,7 @@
 #         bash manga-dev/run.sh --styles manga-tone-v1     one style
 #         bash manga-dev/run.sh --games 35 --force         redo one game
 #         bash manga-dev/run.sh --games 35 --print         show the assembled request text
+#         bash manga-dev/run.sh --games 35 --again 10      10 more takes, old images are kept
 set -euo pipefail
 cd "$(dirname "$0")/.."
 python3 scripts/generate_combos.py --dir manga-dev "$@"

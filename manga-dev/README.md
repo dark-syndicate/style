@@ -12,6 +12,7 @@ bash manga-dev/run.sh                              # все недостающи
 bash manga-dev/run.sh --styles manga-tone-v1       # только одна версия стиля
 bash manga-dev/run.sh --games 35                   # только Vampire Vegan
 bash manga-dev/run.sh --games 35 --force           # перегенерировать
+bash manga-dev/run.sh --games 35 --again 10        # ещё 10 картинок, старые не трогаются (-take2, -take3, …)
 bash manga-dev/run.sh --games 35 --print           # показать собранный текст запроса
 bash manga-dev/run.sh --dry-run                    # что будет сгенерировано
 ```

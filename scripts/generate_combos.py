@@ -11,6 +11,10 @@ Examples (from the repo root):
     python3 scripts/generate_combos.py --dir manga-dev --styles manga-tone-v1  # one style
     python3 scripts/generate_combos.py --dir manga-dev --games 35 --force      # redo one game
     python3 scripts/generate_combos.py --dir manga-dev --games 35 --styles manga-tone-v1 --print
+    python3 scripts/generate_combos.py --dir manga-dev --games 35 --again 10   # 10 more takes, keep old ones
+
+With --again N the existing images are kept and N new ones are added as
+<game>--<style>-take2.png, -take3.png, ... (the first free numbers; the plain name counts as take 1).
 """
 
 import argparse
@@ -35,6 +39,8 @@ def parse_args():
     p.add_argument("--print", action="store_true", help="print the assembled prompts and exit")
     p.add_argument("--dry-run", action="store_true", help="list what would be generated")
     p.add_argument("--force", action="store_true", help="regenerate even if the image exists")
+    p.add_argument("--again", type=int, default=0, metavar="N",
+                   help="add N new takes per combination as <name>-takeK, never overwriting existing images")
     p.add_argument("--model", default="gpt-image-2.5-sunburst")
     p.add_argument("--size", default="2048x1152")
     p.add_argument("--quality", default="high")
@@ -42,6 +48,17 @@ def parse_args():
     p.add_argument("--workers", type=int, default=5)
     p.add_argument("--retries", type=int, default=3)
     return p.parse_args()
+
+
+def new_takes(name, prompt, out, n):
+    """The first n free take slots: take 1 is <name>.<ext>, take k is <name>-take<k>.<ext>."""
+    jobs, k = [], 1
+    while len(jobs) < n:
+        path = out if k == 1 else out.with_name(f"{name}-take{k}{out.suffix}")
+        if not path.exists():
+            jobs.append((path.stem, prompt, path))
+        k += 1
+    return jobs
 
 
 def main():
@@ -70,8 +87,12 @@ def main():
         for name, prompt, _ in combos:
             print(f"===== {name}\n{prompt}\n")
         return 0
-    jobs = [c for c in combos if args.force or not c[2].exists()]
-    print(f"{len(combos)} combinations, {len(combos) - len(jobs)} already generated, {len(jobs)} to go")
+    if args.again > 0:
+        jobs = [job for c in combos for job in new_takes(*c, args.again)]
+        print(f"{len(combos)} combinations, {args.again} new takes each, {len(jobs)} to go")
+    else:
+        jobs = [c for c in combos if args.force or not c[2].exists()]
+        print(f"{len(combos)} combinations, {len(combos) - len(jobs)} already generated, {len(jobs)} to go")
     if args.dry_run:
         for name, _, out in jobs:
             print(f"  {name} -> {out.relative_to(ROOT)}")
