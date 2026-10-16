@@ -37,7 +37,7 @@ def parse_args():
     p.add_argument("--quality", default="high", help="auto, low, medium, high, ...")
     p.add_argument("--format", default="png", choices=["png", "jpeg", "webp"])
     p.add_argument("--only", action="append", default=[], help="substring filter on file name, repeatable")
-    p.add_argument("--workers", type=int, default=3, help="parallel requests")
+    p.add_argument("--workers", type=int, default=5, help="parallel requests")
     p.add_argument("--retries", type=int, default=3)
     p.add_argument("--force", action="store_true", help="regenerate even if the image exists")
     p.add_argument("--dry-run", action="store_true")
