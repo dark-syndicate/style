@@ -116,7 +116,7 @@ def main():
 
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     import build_gallery
-    build_gallery.build(OUT_DIR)
+    build_gallery.build(OUT_DIR, args.only)
     if failed:
         print(f"\n{len(failed)} failed, rerun to retry them: {', '.join(failed)}")
         return 1
