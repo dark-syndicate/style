@@ -119,7 +119,7 @@ td.num { font-variant-numeric: tabular-nums; }
 <script>
 const DATA = {"title": "generated", "games": [{"id": "29_magnificent_mime", "label": "Magnificent Mime"}, {"id": "35_vampire_vegan", "label": "Vampire Vegan"}, {"id": "37_coupon_queen", "label": "Coupon Queen"}], "styles": [{"id": "manga-tone-v1", "label": "Manga Tone V1"}], "images": {}};
 const KEY = "style-duel:" + DATA.title;
-const games = DATA.games, styles = DATA.styles;
+let games = DATA.games, styles = DATA.styles;
 const label = (list, id) => (list.find(x => x.id === id) || {label: id}).label;
 // Images are looked up by name at view time, so the page keeps working even if it was
 // built before the images existed. Files that fail to load are marked missing.
@@ -145,10 +145,14 @@ if (!styles.some(s => s.id === state.style)) state.style = styles[0].id;
 
 // every game x every pair of styles that both have images
 const pairs = [];
-games.forEach(g => {
-  const av = styles.filter(s => has(g.id, s.id));
-  for (let i = 0; i < av.length; i++) for (let j = i + 1; j < av.length; j++) pairs.push([g.id, av[i].id, av[j].id]);
-});
+function buildPairs() {
+  pairs.length = 0;
+  games.forEach(g => {
+    const av = styles.filter(s => has(g.id, s.id));
+    for (let i = 0; i < av.length; i++) for (let j = i + 1; j < av.length; j++) pairs.push([g.id, av[i].id, av[j].id]);
+  });
+}
+buildPairs();
 function setPair(i) {
   if (!pairs.length) return;
   for (let n = 0; n < pairs.length; n++, i++) {
@@ -316,7 +320,48 @@ document.addEventListener("keydown", e => {
   }
 });
 
+// Auto-discovery: when the page is served over http (scripts/serve_gallery.py), read the
+// folder listing and pick up every <game>--<style> image by itself, re-checking every 10 s,
+// so the page never needs rebuilding. Opened as a plain file it uses the embedded list.
+const IMG_RE = /^([^\/?#]+?)--([^\/?#]+)\.(png|jpe?g|webp)$/i;
+function nice(stem) {
+  stem = stem.replace(/^style\d-/, "");
+  let parts = stem.split("_");
+  if (/^\d+$/.test(parts[0])) parts = parts.slice(1);
+  return parts.join(" ").replace(/-/g, " ").split(/\s+/).filter(Boolean)
+    .map(w => w[0].toUpperCase() + w.slice(1)).join(" ");
+}
+let lastListing = "";
+async function discover() {
+  if (location.protocol === "file:") return;
+  let names;
+  try {
+    const r = await fetch("__list?_=" + Date.now(), { cache: "no-store" });
+    if (!r.ok) return;
+    names = (await r.json()).filter(n => IMG_RE.test(n)).sort();
+  } catch (e) { return; }
+  const key = names.join("|");
+  if (!names.length || key === lastListing) return;
+  lastListing = key;
+  const imgs = {}, g = new Map(), st = new Map();
+  names.forEach(n => {
+    const [, game, style] = n.match(IMG_RE);
+    imgs[game + "--" + style] = n;
+    g.set(game, nice(game)); st.set(style, nice(style));
+  });
+  DATA.images = imgs;
+  games = [...g].sort((a, b) => a[0].localeCompare(b[0], undefined, { numeric: true })).map(([id, label]) => ({ id, label }));
+  styles = [...st].sort((a, b) => a[0].localeCompare(b[0], undefined, { numeric: true })).map(([id, label]) => ({ id, label }));
+  missing.clear(); buildPairs();
+  if (!games.some(x => x.id === state.game)) state.game = games[0].id;
+  if (!state.a || !state.b || !has(state.game, state.a) || !has(state.game, state.b)
+      || !styles.some(x => x.id === state.a) || !styles.some(x => x.id === state.b)) setPair(state.pairIdx || 0);
+  render();
+}
+
 render();
+discover();
+setInterval(discover, 10000);
 </script>
 </body>
 </html>
