@@ -28,3 +28,9 @@ python3 scripts/build_prompts.py --games 24 25 26 27 28 29 30 31 32 33 --styles 
 ```sh
 python3 scripts/generate_style_tests.py --input style-picks --output style-picks-generated
 ```
+
+Сравнить стили: откройте `style-picks-generated/index.html` (дуэли, сетки, рейтинг). После генерации новых картинок обновите страницу:
+
+```sh
+python3 scripts/build_gallery.py style-picks-generated
+```
