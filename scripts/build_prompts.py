@@ -56,8 +56,8 @@ def theme_part(game_file):
 
 
 def adapt_grid(style_text, theme, style_name):
-    if "6x5" not in theme:
-        return style_text
+    if "6x5" not in theme or "6x5 symbol board" in style_text:
+        return style_text  # 5x5 game, or the style is already written for 6x5
     for old, new in GRID_6X5:
         if old not in style_text:
             sys.exit(f"{style_name}: cannot adapt to 6x5, text '{old}' not found")
