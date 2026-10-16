@@ -6,7 +6,9 @@ Usage (from the repo root):
     python3 scripts/build_gallery.py style-generated
 
 Writes <folder>/index.html (self-contained, images referenced by relative path).
-Open it by double-clicking; re-run after new images are generated.
+If <folder> ends with "-generated" and the matching prompt folder exists (e.g.
+style-cross-generated -> style-cross), every prompt gets a slot, so images that are not
+generated yet show as placeholders. generate_style_tests.py rebuilds the page after each run.
 """
 
 import json
@@ -27,30 +29,38 @@ def label(stem, strip_prefixes=()):
     return " ".join(w.capitalize() for w in "-".join(parts).replace("-", " ").split())
 
 
-def main():
-    folder = ROOT / (sys.argv[1] if len(sys.argv) > 1 else "style-picks-generated")
-    if not folder.is_dir():
-        sys.exit(f"folder {folder} not found")
+def build(folder):
+    folder = Path(folder)
+    prompts = folder.with_name(folder.name[: -len("-generated")]) if folder.name.endswith("-generated") else None
     images, games, styles = {}, {}, {}
-    for f in sorted(folder.iterdir()):
-        if f.suffix.lower() not in EXTS or "--" not in f.stem:
-            continue
-        game, style = f.stem.split("--", 1)
-        images[f"{game}--{style}"] = f.name
+    entries = []
+    if prompts and prompts.is_dir():
+        entries += [(f.stem, None) for f in sorted(prompts.glob("*--*.md"))]
+    if folder.is_dir():
+        entries += [(f.stem, f.name) for f in sorted(folder.iterdir()) if f.suffix.lower() in EXTS and "--" in f.stem]
+    for stem, name in entries:
+        game, style = stem.split("--", 1)
+        if name:
+            images[stem] = name
         games[game] = label(game)
-        styles[style] = label(style, ("style4-", "style3-", "style2-", "style1-"))
-    if not images:
-        sys.exit(f"no <game>--<style> images in {folder}")
+        styles[style] = label(style, ("style5-", "style4-", "style3-", "style2-", "style1-"))
+    if not games:
+        sys.exit(f"no <game>--<style> images or prompts for {folder}")
     data = {
         "title": folder.name,
-        "games": [{"id": k, "label": v} for k, v in games.items()],
+        "games": [{"id": k, "label": v} for k, v in sorted(games.items())],
         "styles": [{"id": k, "label": v} for k, v in styles.items()],
         "images": images,
     }
     html = TEMPLATE.replace("__DATA__", json.dumps(data, ensure_ascii=False)).replace("__TITLE__", folder.name)
+    folder.mkdir(parents=True, exist_ok=True)
     out = folder / "index.html"
     out.write_text(html, encoding="utf-8")
     print(f"{len(images)} images, {len(games)} games, {len(styles)} styles -> {out.relative_to(ROOT)}")
+
+
+def main():
+    build(ROOT / (sys.argv[1] if len(sys.argv) > 1 else "style-picks-generated"))
 
 
 TEMPLATE = r"""<!doctype html>

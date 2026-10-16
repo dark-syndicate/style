@@ -22,6 +22,7 @@ To get a full prompt ready to paste, take the style file's text, then a blank li
    - `-human` variants replace "muzzle/beak" with human facial features and proportions. Use them for human or humanoid mascots.
    - `-nocenter` variants are older and lack the "board EXACTLY IN THE CENTER" requirement. New games use the centered versions.
 4. `style4-*`: forty experimental variations at MEDIUM detail (richer than style2, never as realistic as style1). Each has one signature twist, listed in `styles/README.md`. Every file works for both animal and human mascots, so they have no `-human` or `-nocenter` variants.
+5. `style5-geo-manga-*`: three hybrids of the user's favourites `style4-faceted-geo` and `style4-manga-tone` (balanced, ink-leaning, prism-leaning). They also forbid readable text in the scene except the logo.
 
 When changing a style, edit the file in `styles/`. Never paste style text back into the game files.
 
@@ -29,8 +30,8 @@ When changing a style, edit the file in `styles/`. Never paste style text back i
 
 - `scripts/build_prompts.py --games ... --styles ... --out <dir>` writes every game × style as a ready-to-paste prompt `<dir>/<game>--<style>.md`. If a game's theme says `6x5`, it rewrites the style's 5x5 composition line for a 6x5 board at assembly time. Styles stay 5x5 in `styles/`.
 - `scripts/generate_style_tests.py [--input dir] [--output dir]` sends each prompt to the OpenAI Images API (`gpt-image-2.5-sunburst`, 2048x1152) and saves images. It needs `OPENAI_API_KEY` and skips images that already exist.
-- `scripts/build_gallery.py [folder]` writes `<folder>/index.html`, a local page for comparing `<game>--<style>` images. It has duels with a swipe slider, game and style grids, and a win-rate ranking (votes are kept in the browser's localStorage). Re-run it after new images arrive.
-- `style-test/`: Lunar Junk in all styles. `style-picks/`: games 24–33 (6x5) in the 6 styles the user picked. Each folder's README has the rebuild command.
+- `scripts/build_gallery.py [folder]` writes `<folder>/index.html`, a local page for comparing `<game>--<style>` images. It has duels with a swipe slider, game and style grids, and a win-rate ranking (votes are kept in the browser's localStorage). `generate_style_tests.py` rebuilds it automatically after every run. For `<x>-generated` folders it also adds slots for prompts in `<x>/` that have no image yet.
+- `style-test/`: Lunar Junk in all styles. `style-picks/`: games 24–33 (6x5) in the 6 styles the user picked. `style-cross/`: games 24–33 in the three style5 hybrids. Each folder's README has the rebuild command.
 
 ## Theme-part conventions (follow them in new games)
 

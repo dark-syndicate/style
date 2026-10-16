@@ -114,6 +114,9 @@ def main():
                 failed.append(name)
                 print(f"[{i}/{len(jobs)}] FAIL  {name}: {e}", flush=True)
 
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import build_gallery
+    build_gallery.build(OUT_DIR)
     if failed:
         print(f"\n{len(failed)} failed, rerun to retry them: {', '.join(failed)}")
         return 1
