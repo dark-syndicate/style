@@ -25,6 +25,12 @@ To get a full prompt ready to paste, take the style file's text, then a blank li
 
 When changing a style, edit the file in `styles/`. Never paste style text back into the game files.
 
+## Scripts and assembled prompt folders
+
+- `scripts/build_prompts.py --games ... --styles ... --out <dir>` writes every game × style as a ready-to-paste prompt `<dir>/<game>--<style>.md`. If a game's theme says `6x5`, it rewrites the style's 5x5 composition line for a 6x5 board at assembly time. Styles stay 5x5 in `styles/`.
+- `scripts/generate_style_tests.py [--input dir] [--output dir]` sends each prompt to the OpenAI Images API (`gpt-image-2.5-sunburst`, 2048x1152) and saves images. It needs `OPENAI_API_KEY` and skips images that already exist.
+- `style-test/`: Lunar Junk in all styles. `style-picks/`: games 24–27 (6x5) in the 6 styles the user picked. Each folder's README has the rebuild command.
+
 ## Theme-part conventions (follow them in new games)
 
 Each theme part needs:

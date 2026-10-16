@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate an image for every prompt in style-test/ via the OpenAI Images API.
+"""Generate an image for every prompt in a folder (default style-test/) via the OpenAI Images API.
 
 Usage (from the repo root):
     pip install openai
@@ -7,8 +7,9 @@ Usage (from the repo root):
     python scripts/generate_style_tests.py                    # all prompts
     python scripts/generate_style_tests.py --only neon-rim    # names containing "neon-rim"
     python scripts/generate_style_tests.py --dry-run          # list what would be generated
+    python scripts/generate_style_tests.py --input style-picks --output style-picks-generated
 
-Images are saved to style-generated/<prompt name>.<format>. Existing images are
+Images are saved to <output>/<prompt name>.<format>. Existing images are
 skipped unless --force is given, so an interrupted run can simply be restarted.
 """
 
@@ -29,6 +30,8 @@ OUT_DIR = ROOT / "style-generated"
 
 def parse_args():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("--input", default="style-test", help="folder with prompt .md files")
+    p.add_argument("--output", default="style-generated", help="folder for generated images")
     p.add_argument("--model", default="gpt-image-2.5-sunburst")
     p.add_argument("--size", default="2048x1152", help="WIDTHxHEIGHT, default is 16:9 2K")
     p.add_argument("--quality", default="high", help="auto, low, medium, high, ...")
@@ -85,7 +88,11 @@ def generate(client, args, prompt_file, out_file):
 
 
 def main():
+    global PROMPTS_DIR, OUT_DIR
     args = parse_args()
+    PROMPTS_DIR, OUT_DIR = ROOT / args.input, ROOT / args.output
+    if not PROMPTS_DIR.is_dir():
+        sys.exit(f"input folder {args.input} not found")
     prompts, jobs = collect_jobs(args)
     print(f"{len(prompts)} prompts, {len(prompts) - len(jobs)} already generated, {len(jobs)} to go")
     if args.dry_run or not jobs:
