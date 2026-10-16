@@ -128,7 +128,12 @@ kbd { font: 11px ui-monospace, monospace; border: 1px solid var(--line); border-
 /* grids */
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 12px; }
 .grid .card { border-color: var(--line); }
-h2 { font-size: 16px; margin: 4px 0 12px; font-weight: 650; }
+h2 { font-size: 16px; margin: 4px 0 12px; font-weight: 650; scroll-margin-top: 70px; }
+#styleList h2, #gameList h2 { margin-top: 28px; }
+.jump { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+.jump a { color: var(--text); text-decoration: none; border: 1px solid var(--line); border-radius: 999px;
+  padding: 4px 12px; font-size: 13px; background: var(--panel); }
+.jump a:hover { border-color: #4a4a55; }
 
 /* ranking */
 table { border-collapse: collapse; width: 100%; max-width: 1100px; }
@@ -160,7 +165,6 @@ td.num { font-variant-numeric: tabular-nums; }
       <label class="tagB">B</label><select id="styleB"></select>
       <button id="viewBtn" title="S">Шторка</button>
     </span>
-    <span id="styleControls" class="controls"><label>Стиль</label><select id="styleOne"></select></span>
   </div>
   <span class="hint" style="margin-left:auto">
     <kbd>←</kbd>/<kbd>→</kbd> голос · <kbd>S</kbd> шторка · <kbd>[</kbd>/<kbd>]</kbd> игра · <kbd>F</kbd> весь экран · <kbd>Esc</kbd>
@@ -177,8 +181,8 @@ td.num { font-variant-numeric: tabular-nums; }
     </div>
     <div class="progress" id="progress"></div>
   </section>
-  <section class="pane" id="pane-game"><h2 id="gameTitle"></h2><div class="grid" id="gameGrid"></div></section>
-  <section class="pane" id="pane-style"><h2 id="styleTitle"></h2><div class="grid" id="styleGrid"></div></section>
+  <section class="pane" id="pane-game"><nav class="jump" id="gameJump"></nav><div id="gameList"></div></section>
+  <section class="pane" id="pane-style"><nav class="jump" id="styleJump"></nav><div id="styleList"></div></section>
   <section class="pane" id="pane-rank">
     <div class="duel-bar"><h2 style="margin:0">Рейтинг по дуэлям</h2><button id="reset">Сбросить голоса</button></div>
     <div class="scroll" id="rank"></div>
@@ -273,13 +277,21 @@ function renderDuel() {
     : "Нужно минимум 2 стиля с картинками в одной игре";
 }
 
+// every game one under another, each with all styles; chips at the top jump to a game
 function renderGame() {
-  $("gameTitle").textContent = label(games, state.game);
-  $("gameGrid").innerHTML = styles.map(s => imgCard(state.game, s.id, "", s.label)).join("");
+  $("gameJump").innerHTML = games.length > 1
+    ? games.map(g => `<a href="#gm-${g.id}">${g.label}</a>`).join("") : "";
+  $("gameList").innerHTML = games.map(g =>
+    `<h2 id="gm-${g.id}">${g.label}</h2><div class="grid">${styles.map(s => imgCard(g.id, s.id, "", s.label)).join("")}</div>`
+  ).join("");
 }
+// every style one under another, each with all games; chips at the top jump to a style
 function renderStyle() {
-  $("styleTitle").textContent = label(styles, state.style);
-  $("styleGrid").innerHTML = games.map(g => imgCard(g.id, state.style, "", g.label)).join("");
+  $("styleJump").innerHTML = styles.length > 1
+    ? styles.map(s => `<a href="#st-${s.id}">${s.label}</a>`).join("") : "";
+  $("styleList").innerHTML = styles.map(s =>
+    `<h2 id="st-${s.id}">${s.label}</h2><div class="grid">${games.map(g => imgCard(g.id, s.id, "", g.label)).join("")}</div>`
+  ).join("");
 }
 function renderRank() {
   const stat = {}; styles.forEach(s => stat[s.id] = { w: 0, l: 0, games: {} });
@@ -308,12 +320,10 @@ function render() {
   document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === state.tab));
   document.querySelectorAll(".pane").forEach(p => p.classList.toggle("active", p.id === "pane-" + state.tab));
   $("duelControls").style.display = state.tab === "duel" ? "" : "none";
-  $("styleControls").style.display = state.tab === "style" ? "" : "none";
   $("game").parentElement.style.display = "";
-  $("game").style.display = $("game").previousElementSibling.style.display = (state.tab === "style" || state.tab === "rank") ? "none" : "";
+  $("game").style.display = $("game").previousElementSibling.style.display = state.tab === "duel" ? "" : "none";
   fill($("game"), games, state.game);
   fill($("styleA"), styles, state.a); fill($("styleB"), styles, state.b);
-  fill($("styleOne"), styles, state.style);
   ({ duel: renderDuel, game: renderGame, style: renderStyle, rank: renderRank })[state.tab]();
   save();
 }
@@ -337,7 +347,6 @@ function stepGame(d) {
 $("game").onchange = e => { state.game = e.target.value; stepGame(0); };
 $("styleA").onchange = e => { state.a = e.target.value; render(); };
 $("styleB").onchange = e => { state.b = e.target.value; render(); };
-$("styleOne").onchange = e => { state.style = e.target.value; render(); };
 $("swap").onclick = () => { [state.a, state.b] = [state.b, state.a]; render(); };
 $("viewBtn").onclick = () => { state.view = state.view === "side" ? "swipe" : "side"; render(); };
 $("voteA").onclick = () => vote("A");
