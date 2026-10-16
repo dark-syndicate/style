@@ -57,8 +57,10 @@ def collect_jobs(args):
     return prompts, jobs
 
 
-def generate(client, args, prompt_file, out_file):
-    prompt = prompt_file.read_text(encoding="utf-8").strip()
+def generate(client, args, prompt_file, out_file, prompt=None):
+    """Generate one image. Pass the prompt text directly, or a file to read it from."""
+    if prompt is None:
+        prompt = prompt_file.read_text(encoding="utf-8").strip()
     for attempt in range(1, args.retries + 1):
         try:
             res = client.images.generate(
@@ -83,7 +85,7 @@ def generate(client, args, prompt_file, out_file):
             if attempt == args.retries:
                 raise
             wait = 5 * 2 ** (attempt - 1)
-            print(f"  retry {attempt}/{args.retries - 1} for {prompt_file.stem} in {wait}s: {e}", flush=True)
+            print(f"  retry {attempt}/{args.retries - 1} for {out_file.stem} in {wait}s: {e}", flush=True)
             time.sleep(wait)
 
 

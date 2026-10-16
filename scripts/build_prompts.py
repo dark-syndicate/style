@@ -48,10 +48,11 @@ def find_style(key):
 
 
 def theme_part(game_file):
+    """Theme text of a game file; an optional first 'STYLE: ...' line is skipped."""
     lines = game_file.read_text(encoding="utf-8").split("\n")
-    if not lines[0].startswith("STYLE:"):
-        sys.exit(f"{game_file.name}: first line must be 'STYLE: ...'")
-    return "\n".join(lines[1:]).strip("\n")
+    if lines[0].startswith("STYLE:"):
+        lines = lines[1:]
+    return "\n".join(lines).strip("\n")
 
 
 def adapt_grid(style_text, theme, style_name):

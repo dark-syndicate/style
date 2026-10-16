@@ -31,13 +31,15 @@ def label(stem, strip_prefixes=()):
     return " ".join(w.capitalize() for w in "-".join(parts).replace("-", " ").split())
 
 
-def build(folder, only=()):
+def build(folder, only=(), slots=()):
+    """slots: extra <game>--<style> names that should get a slot even without an image yet."""
     folder = Path(folder)
     prompts = folder.with_name(folder.name[: -len("-generated")]) if folder.name.endswith("-generated") else None
     images, games, styles = {}, {}, {}
     entries = []
     if prompts and prompts.is_dir():
         entries += [(f.stem, None) for f in sorted(prompts.glob("*--*.md"))]
+    entries += [(s, None) for s in slots]
     if folder.is_dir():
         entries += [(f.stem, f.name) for f in sorted(folder.iterdir()) if f.suffix.lower() in EXTS and "--" in f.stem]
     if only:

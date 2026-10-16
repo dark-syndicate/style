@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
-# Build the 3 prompts (Zombie Zumba, Vampire Vegan, Coupon Queen x original manga-tone),
-# generate images, rebuild the gallery.
-# Usage:  bash manga-dev/run.sh            (extra args go to the generator, e.g. --force, --only 35_)
+# Generate every game in manga-dev/games x every style in manga-dev/styles straight to
+# manga-dev/generated/ (no prompt files), then rebuild the gallery manga-dev/generated/index.html.
+# Usage:  bash manga-dev/run.sh                            missing images only
+#         bash manga-dev/run.sh --styles manga-tone-v1     one style
+#         bash manga-dev/run.sh --games 35 --force         redo one game
+#         bash manga-dev/run.sh --games 35 --print         show the assembled request text
 set -euo pipefail
 cd "$(dirname "$0")/.."
-python3 scripts/build_prompts.py \
-  --games-dir manga-dev/games --styles-dir manga-dev/styles \
-  --games 31 35 37 --styles style4-manga-tone \
-  --out manga-dev/prompts
-python3 scripts/generate_style_tests.py --input manga-dev/prompts --output manga-dev/prompts-generated "$@"
+python3 scripts/generate_combos.py --dir manga-dev "$@"
